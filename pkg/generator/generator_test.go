@@ -30,7 +30,7 @@ func TestGeneratorNew(t *testing.T) {
 func TestGeneratorGet(t *testing.T) {
 	g := &Generator{}
 
-	// Test successfull name generation
+	// Test successful name generation
 	g.New("{{ .Name }}{{ .Adjective }}{{ .Adjective }}", "name", '-')
 	fmt.Println(g.Get())
 }

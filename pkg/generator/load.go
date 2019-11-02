@@ -1,3 +1,5 @@
+// Package generator encapsulates the structure which is in charge
+// of populating the petname array
 package generator
 
 var (
