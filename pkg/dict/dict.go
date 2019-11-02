@@ -86,7 +86,7 @@ func (t *Tree) Search(k []int) bool {
 		if len(tmp) <= 1 {
 			return true
 		}
-		tmp = tmp[1:len(tmp)]
+		tmp = tmp[1:]
 		if tmp[0] > node.Key {
 			node = node.Right
 		} else {
