@@ -3,6 +3,7 @@
 package generator
 
 var (
+	// Name is a list of default scientist names
 	Name = []string{
 		"albattani",
 		"allen",
@@ -240,6 +241,7 @@ var (
 		"zhukovsky",
 	}
 
+	// Adjective is a list of default adjectives
 	Adjective = []string{
 		"admiring",
 		"adoring",
