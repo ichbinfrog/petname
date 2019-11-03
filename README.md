@@ -1,7 +1,7 @@
 
 # Petname
 
-[![Go Report Card](https://goreportcard.com/badge/ichbinfrog/petname)](https://goreportcard.com/report/github.com/ichbinfrog/petname) [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/ichbinfrog/petname/blob/master/LICENSE) [![GoDoc](https://godoc.org/github.com/ichbinfrog/petname?status.svg)](https://godoc.org/github.com/ichbinfrog/petname) [![GoVersion](https://img.shields.io/badge/goversion-1.13.1-brightgreen.svg)](https://github.com/ichbinfrog/swivel/blob/master/LICENSE)
+[![Go Report Card](https://goreportcard.com/badge/ichbinfrog/petname)](https://goreportcard.com/report/github.com/ichbinfrog/petname) [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/ichbinfrog/petname/blob/master/LICENSE) [![GoDoc](https://godoc.org/github.com/ichbinfrog/petname?status.svg)](https://godoc.org/github.com/ichbinfrog/petname) ![Build](https://travis-ci.org/ichbinfrog/petname.svg?branch=master)
 
 Petname is a server that generates unique petnames (see [RFC](https://tools.ietf.org/html/rfc1178)) which are pronounceable, sometimes even memorable names consisting of a random combination of adverbs, an adjective, and an animal name.
 
