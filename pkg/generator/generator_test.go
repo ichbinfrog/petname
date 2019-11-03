@@ -39,7 +39,7 @@ func BenchmarkGeneratorGet(b *testing.B) {
 	g := &Generator{}
 	g.New("{{ .Name }}{{ .Adjective }}{{ .Adjective }}", "name", '-')
 
-	for i := 0; i < b.N; i++ {
+	for i := 0; i < b.N*b.N; i++ {
 		fmt.Println(g.Get())
 	}
 }

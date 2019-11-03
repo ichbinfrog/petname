@@ -9,4 +9,84 @@ You can use this server to:
 - Create unique memorable names for your container/processes
 - (**future**) Dynamically import more names into the server
 - (**future**) Distributed lightweight API server to handle unique cluster names
-- (**future**) Securely access the API using Bearer Tokens
+- (**future**) Secure access to the API using Bearer Tokens
+
+## Installation
+
+Using the docker image (recommended):
+```sh
+# If you want to build your own image
+docker build . -t petname:v0.0.1
+
+# If you want to pull directly from dockerhub
+docker pull ichbinfrog/petname:v0.0.1
+```
+
+Using the binary:
+```sh
+# Assuming you've downloaded the latest release
+# on the github release tab
+chmod +x ./petname:v0.0.1
+
+# If you want to add it to your path
+mv ./petname:v0.0.1 /usr/local/bin/petname
+```
+
+## Running
+
+Using the docker image:
+```sh
+docker run --rm -d --port $PORT:$PORT ichbinfrog/petname:v0.0.1 serve --port $PORT
+```
+
+Using the binary:
+```
+Usage:
+  petname serve [flags]
+
+Flags:
+  -h, --help          help for serve
+  -p, --port string   Port for serving the API server (default: 8000)
+
+Global Flags:
+      --config string   config file (default is $HOME/.petname.yaml)
+```
+
+## Querying the API
+
+| Endpoint       | Description                                  |
+| -------------- | -------------------------------------------- |
+| `/get/v1`      | Default endpoint present, returns a petname  |
+| `/get/v1/n`    | Default endpoint present, returns n petnames |
+| `/api`         | Create a new API endpoint                    |
+| `/get/{api}`   | return a petname on an added API             |
+| `/get/{api}/n` | return n petnames on an added API            |
+
+In order to create an API endpoint, you have to send a GET request with the query parameters:
+- `name`: the name of the desired endpoints (will result in the `/get/{name}` API being available)
+- `lock`: (future) boolean in "true" or "false" that will allow for enabling Bearer Token access
+- `separator`: separator for the petname template generation, can be a string with multiple characters but only the first one will be taken in account
+- `template`: template for the petname generation. Semi Golang text/template with two available variable atm ( `{{ .Name }}` and `{{ .Adjective }}`).
+
+For example with golang:
+```go
+// Creates a request to send to the /api endpoint
+req, err := http.NewRequest("GET", "http://localhost:8000/api", nil)
+if err != nil {
+  t.Errorf(err.Error())
+}
+
+// Creates a http client
+client := &http.Client{}
+
+// Adds the v2 endpoint
+q := req.URL.Query()
+q.Add("name", "v2")
+q.Add("lock", "false")
+q.Add("separator", "~")
+q.Add("template", "{{.Name}}{{.Name}}{{.Adjective}}")
+
+// Perform the request
+r, reqErr := client.Do(req)
+```
+Now you can query the `/get/v2` endpoint and it would give you names such as: `gopher~duck~boring`

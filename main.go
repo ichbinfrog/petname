@@ -16,26 +16,9 @@ limitations under the License.
 package main
 
 import (
-
-	// "github.com/ichbinfrog/petname/cmd"
-
-	"fmt"
-	"os"
-
-	"github.com/ichbinfrog/petname/pkg/dict"
+	"github.com/ichbinfrog/petname/cmd"
 )
 
 func main() {
-	// cmd.Execute()
-	tree := &dict.Tree{}
-	tree.Insert(1)
-	tree.Insert(5)
-	tree.Insert(8)
-	tree.Insert(20)
-	tree.Insert(6)
-	tree.Insert(2)
-	tree.Insert(19)
-
-	dict.Print(os.Stdout, tree.Root, 2, '└')
-	fmt.Println(tree.Search([]int{1, 5, 8, 20, 19, 30}))
+	cmd.Execute()
 }
