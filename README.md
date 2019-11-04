@@ -54,13 +54,14 @@ Global Flags:
 
 ## Querying the API
 
-| Endpoint       | Description                                  |
-| -------------- | -------------------------------------------- |
-| `/get/v1`      | Default endpoint present, returns a petname  |
-| `/get/v1/n`    | Default endpoint present, returns n petnames |
-| `/api`         | Create a new API endpoint                    |
-| `/get/{api}`   | return a petname on an added API             |
-| `/get/{api}/n` | return n petnames on an added API            |
+| Endpoint       | Description                                                         |
+| -------------- | ------------------------------------------------------------------- |
+| `/get/v1`      | Default endpoint present, returns a petname                         |
+| `/get/v1/n`    | Default endpoint present, returns n petnames                        |
+| `/api`         | Create a new API endpoint                                           |
+| `/get/{api}`   | return a petname on an added API                                    |
+| `/get/{api}/n` | return n petnames on an added API                                   |
+| `/reload`      | reloads the configuration if changes to the .seed.yaml file is done |
 
 In order to create an API endpoint, you have to send a GET request with the query parameters:
 - `name`: the name of the desired endpoints (will result in the `/get/{name}` API being available)
