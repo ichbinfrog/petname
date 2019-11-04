@@ -18,5 +18,6 @@ RUN go build -o /go/bin/app
 # Distroless execution image
 FROM gcr.io/distroless/base
 COPY --from=petname-builder /go/bin/app /
+COPY .seed.yaml $HOME/.seed.yaml
 
 ENTRYPOINT ["/app"]
