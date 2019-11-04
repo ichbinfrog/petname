@@ -6,6 +6,8 @@ import (
 	"net/http"
 	"strconv"
 	"testing"
+
+	"github.com/ichbinfrog/petname/pkg/generator"
 )
 
 var (
@@ -14,6 +16,7 @@ var (
 )
 
 func init() {
+	generator.Load("../..")
 	go func() {
 		i.Start(prt)
 	}()
@@ -24,7 +27,6 @@ func handleReturn(t *testing.T, p string, prt int, code int) {
 	if err != nil {
 		t.Errorf("[%s] Encountered error while querying , see %s", p, err.Error())
 	}
-
 	if r.StatusCode != code {
 		t.Errorf("[%s] Status code should be %d", p, code)
 	}
@@ -77,7 +79,7 @@ func TestReturn(t *testing.T) {
 	handleReturn(t, "/health", prt, http.StatusOK)
 
 	// Test Reload handler return code
-	handleReturn(t, "/reload", prt, http.StatusTeapot)
+	handleReturn(t, "/reload", prt, http.StatusOK)
 
 	// Test Readiness probe return code
 	handleReturn(t, "/ready", prt, http.StatusOK)

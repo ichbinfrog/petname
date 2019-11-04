@@ -7,6 +7,7 @@ import (
 	"strconv"
 
 	"github.com/gorilla/mux"
+	"github.com/ichbinfrog/petname/pkg/generator"
 )
 
 // Instance is a structure that stores the router
@@ -35,7 +36,11 @@ func handleHealth(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleReload(w http.ResponseWriter, r *http.Request) {
-	http.Error(w, http.StatusText(http.StatusTeapot), http.StatusTeapot)
+	if err := generator.Reload(); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	} else {
+		http.Error(w, http.StatusText(http.StatusOK), http.StatusOK)
+	}
 }
 
 func handleReadiness(w http.ResponseWriter, r *http.Request) {

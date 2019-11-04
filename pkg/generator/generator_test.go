@@ -5,6 +5,10 @@ import (
 	"testing"
 )
 
+func init() {
+	Load("../..")
+}
+
 func TestGeneratorNew(t *testing.T) {
 	g := &Generator{}
 
@@ -29,7 +33,6 @@ func TestGeneratorNew(t *testing.T) {
 
 func TestGeneratorGet(t *testing.T) {
 	g := &Generator{}
-
 	// Test successful name generation
 	g.New("{{ .Adverb }}{{ .Name }}{{ .Adjective }}{{ .Adjective }}", "name", '-')
 	fmt.Println(g.Get())

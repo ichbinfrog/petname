@@ -37,6 +37,9 @@ var (
 
 func init() {
 	rand.Seed(time.Now().UTC().UnixNano())
+	if err := Load("."); err != nil {
+		panic(err)
+	}
 }
 
 func getName() (int, string) {
