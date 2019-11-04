@@ -23,10 +23,12 @@ type Generator struct {
 }
 
 const (
-	// NameTemplate is the call value for templating
+	// NameTemplate is the call value for templating names
 	NameTemplate = ".Name"
-	// AdjectiveTemplate is the call value for templating
+	// AdjectiveTemplate is the call value for templating adjectives
 	AdjectiveTemplate = ".Adjective"
+	// AdverbTemplate is the call value for templating adverbs
+	AdverbTemplate = ".Adverb"
 )
 
 var (
@@ -38,13 +40,18 @@ func init() {
 }
 
 func getName() (int, string) {
-	index := rand.Intn(len(Name))
-	return index, Name[index]
+	index := rand.Intn(len(Names))
+	return index, Names[index]
 }
 
 func getAdjective() (int, string) {
-	index := rand.Intn(len(Adjective))
-	return index, Adjective[index]
+	index := rand.Intn(len(Adjectives))
+	return index, Adjectives[index]
+}
+
+func getAdverb() (int, string) {
+	index := rand.Intn(len(Adverbs))
+	return index, Adverbs[index]
 }
 
 // New generates a new generator from a given template
@@ -55,6 +62,8 @@ func (g *Generator) New(t string, n string, s rune) {
 			g.TemplateInterface = append(g.TemplateInterface, getName)
 		} else if v[1] == AdjectiveTemplate {
 			g.TemplateInterface = append(g.TemplateInterface, getAdjective)
+		} else if v[1] == AdverbTemplate {
+			g.TemplateInterface = append(g.TemplateInterface, getAdverb)
 		} else {
 			return
 		}

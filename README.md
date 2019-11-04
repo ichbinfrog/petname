@@ -66,7 +66,7 @@ In order to create an API endpoint, you have to send a GET request with the quer
 - `name`: the name of the desired endpoints (will result in the `/get/{name}` API being available)
 - `lock`: (future) boolean in "true" or "false" that will allow for enabling Bearer Token access
 - `separator`: separator for the petname template generation, can be a string with multiple characters but only the first one will be taken in account
-- `template`: template for the petname generation. Semi Golang text/template with two available variable atm ( `{{ .Name }}` and `{{ .Adjective }}`).
+- `template`: template for the petname generation. Semi Golang text/template with two available variable atm ( `{{ .Name }}`, `{{ .Adjective }}` and `{{ .Adverb }}`).
 
 For example with golang:
 ```go

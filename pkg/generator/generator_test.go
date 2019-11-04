@@ -21,7 +21,7 @@ func TestGeneratorNew(t *testing.T) {
 	}
 
 	// Successfully create template
-	g.New("{{ .Name }}{{ .Adjective }}{{ .Adjective }}", "name", '+')
+	g.New("{{ .Adverb }}{{ .Name }}{{ .Adjective }}{{ .Adjective }}", "name", '+')
 	if len(g.TemplateInterface) == 0 {
 		t.Errorf("Templating failed when it should succeed")
 	}
@@ -31,13 +31,13 @@ func TestGeneratorGet(t *testing.T) {
 	g := &Generator{}
 
 	// Test successful name generation
-	g.New("{{ .Name }}{{ .Adjective }}{{ .Adjective }}", "name", '-')
+	g.New("{{ .Adverb }}{{ .Name }}{{ .Adjective }}{{ .Adjective }}", "name", '-')
 	fmt.Println(g.Get())
 }
 
 func BenchmarkGeneratorGet(b *testing.B) {
 	g := &Generator{}
-	g.New("{{ .Name }}{{ .Adjective }}{{ .Adjective }}", "name", '-')
+	g.New("{{ .Adverb }}{{ .Name }}{{ .Adjective }}", "name", '-')
 
 	for i := 0; i < b.N*b.N; i++ {
 		fmt.Println(g.Get())
