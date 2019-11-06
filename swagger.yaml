@@ -1,0 +1,189 @@
+swagger: "2.0"
+info:
+  description: "This is a Petname generator server. You can find more about it at https://github.com/ichbinfrog/petname"
+  version: "v0.1.0"
+  title: "Petname"
+  license:
+    name: "Apache 2.0"
+    url: "http://www.apache.org/licenses/LICENSE-2.0.html"
+
+basePath: "/v1"
+tags:
+- name: "api"
+  description: "API endpoint management"
+- name: "health"
+  description: "Health probe endpoint"
+- name: "petname"
+  description: "Endpoint to get petname"
+
+schemes:
+- "http"
+
+paths:
+  /health:
+    get:
+      tags:
+        - "health"
+      summary: "Endpoint for health probes"
+      responses:
+        200:
+          description: "OK"
+        404:
+          description: "API Not found"
+
+  /api/{api}:
+    get:
+      security:
+        - Bearer: []
+      tags:
+        - "api"
+      summary: "Get API information on one specific api"
+      operationId: "getAllAPI"
+      produces:
+      - "application/json"
+      parameters:
+        - name: "api"
+          in: "path"
+          required: true
+          description: "name of api information to query"
+          type: "string"
+      responses:
+        200:
+          description: "OK"
+          schema:
+            $ref: "#/definitions/API"
+        404:
+          description: "API Not found"
+
+  /api/{api}/reload:
+    get:
+      security:
+        - Bearer: []
+      tags:
+        - "api"
+      summary: "Clears the used list of petnames"
+      operationId: "reloadAPI"
+      produces:
+      - "application/json"
+      parameters:
+        - name: "api"
+          in: "path"
+          required: true
+          description: "name of api information to query"
+          type: "string"
+      responses:
+        200:
+          description: "OK"
+        404:
+          description: "API Not found"
+
+  /api/{api}/add:
+    get:
+      security:
+        - Bearer: []
+      tags:
+        - "api"
+      summary: "Add a seed"
+      operationId: "addSeed"
+      produces:
+      - "application/json"
+      parameters:
+        - name: "api"
+          in: "path"
+          required: true
+          description: "name of api information to query"
+          type: "string"
+        - name: "adj"
+          in: "query"
+          type: "string"
+          description: "adjective to add"
+        - name: "name"
+          in: "query"
+          type: "string"
+          description: "name to add"
+        - name: "adverb"
+          in: "query"
+          type: "string"
+          description: "adverb to add"
+      responses:
+        200:
+          description: OK
+        404:
+          description: "API Not found"
+
+  /api/{api}/remove:
+    get:
+      security:
+        - Bearer: []
+      tags:
+        - "api"
+      summary: "Remove a seed"
+      operationId: "removeSeed"
+      produces:
+      - "application/json"
+      parameters:
+        - name: "api"
+          in: "path"
+          required: true
+          description: "name of api information to query"
+          type: "string"
+        - name: "adj"
+          in: "query"
+          type: "string"
+          description: "adjective to add"
+        - name: "name"
+          in: "query"
+          type: "string"
+          description: "name to add"
+        - name: "adverb"
+          in: "query"
+          type: "string"
+          description: "adverb to add"
+      responses:
+        200:
+          description: OK
+        404:
+          description: "API Not found"
+
+  /petname/{api}:
+    get:
+      security:
+        - Bearer: []
+      tags:
+        - "petname"
+      summary: "Get a petname from an API"
+      operationId: "getPetname"
+      produces:
+      - "application/json"
+      parameters:
+        - name: "api"
+          in: "path"
+          description: "name of the api used to generate the petname"
+          required: true
+          type: "string"
+        - name: "amount"
+          in: "query"
+          type: integer
+          description: "number of desired names"
+      responses:
+        200:
+          description: "OK"
+        404:
+          description: "API Not found"
+
+securityDefinitions:
+  Bearer:
+    type: apiKey
+    name: Authorization
+    in: header
+
+definitions:
+  API:
+    type: "object"
+    properties:
+      name:
+        type: "string"
+        minLength: 1
+      free:
+        type: integer
+        minimum: 0
