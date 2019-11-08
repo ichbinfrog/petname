@@ -1,7 +1,9 @@
 package server
 
 import (
+	"fmt"
 	"github.com/gorilla/mux"
+	"net/http"
 )
 
 // Instance is a structure that stores the router
@@ -51,4 +53,10 @@ func (i *Instance) SetupRouter() {
 		Name("AddAPI").
 		Path("/api").
 		HandlerFunc(i.AddAPI)
+}
+
+// Start loads router configuration and starts the http listening
+func (i *Instance) Start(port int) {
+	i.SetupRouter()
+	http.ListenAndServe(fmt.Sprintf(":%d", port), i.Router)
 }
