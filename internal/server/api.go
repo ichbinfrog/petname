@@ -1,64 +1,122 @@
 package server
 
 import (
+	"fmt"
+	"github.com/gorilla/mux"
 	"net/http"
 	"strconv"
 )
 
+// AddAPI adds an API endpoint
 func (i *Instance) AddAPI(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-	q := r.URL.Query()
+	param := r.URL.Query()
 	err := ""
-	if len(q) < 1 {
-		err = "Query param cannot be empty"
+	if len(param) < 1 {
+		err = err + "Query param cannot be empty, "
 	}
 
-	if q["lock"] == nil || len(q["lock"]) != 1 {
-		err = "Lock query param cannot be empty"
+	if param["lock"] == nil || len(param["lock"]) != 1 {
+		err = err + "Lock query param cannot be empty, "
 	}
 
-	if q["name"] == nil || len(q["name"]) != 1 {
-		err = "Name query param cannot be empty"
+	if param["name"] == nil || len(param["name"]) != 1 {
+		err = err + "Name query param cannot be empty, "
 	}
 
-	if q["template"] == nil || len(q["template"]) != 1 {
-		err = "Template query param cannot be empty"
+	if param["template"] == nil || len(param["template"]) != 1 {
+		err = err + "Template query param cannot be empty, "
 	}
 
-	if q["separator"] == nil || len(q["separator"]) != 1 {
-		err = "Separator query param cannot be empty"
+	if param["separator"] == nil || len(param["separator"]) != 1 {
+		err = err + "Separator query param cannot be empty, "
 	}
 
 	if len(err) != 0 {
-		http.Error(w, err, http.StatusInternalServerError)
+		http.Error(w, err, http.StatusBadRequest)
 		return
 	}
 
-	lock, _ := strconv.ParseBool(q["lock"][0])
-	if i.SetupAPI(q["name"][0], lock, q["template"][0], q["separator"][0]) {
+	lock, errConv := strconv.ParseBool(param["lock"][0])
+	if errConv != nil {
+		http.Error(w, errConv.Error(), http.StatusBadRequest)
+		return
+	}
+
+	if i.SetupAPI(param["name"][0], lock, param["template"][0], param["separator"][0]) {
 		w.Write([]byte("Successful insert"))
 	} else {
-		http.Error(w, "Failed insert due to duplicate", http.StatusInternalServerError)
+		http.Error(w, "Failed insert due to duplicate", http.StatusBadRequest)
 	}
-	w.WriteHeader(http.StatusOK)
 }
 
-func AddSeed(w http.ResponseWriter, r *http.Request) {
+// GetInfoAPI returns informations about a specific API
+func (i *Instance) GetInfoAPI(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-	w.WriteHeader(http.StatusOK)
+	for _, a := range i.API {
+		if a.Name == mux.Vars(r)["api"] {
+			w.Write([]byte(fmt.Sprintf("%+v\n", a)))
+			return
+		}
+	}
+
+	http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 }
 
-func GetAllAPI(w http.ResponseWriter, r *http.Request) {
+// ReloadAPI cleans the Used binary tree for a specific API
+func (i *Instance) ReloadAPI(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-	w.WriteHeader(http.StatusOK)
+
+	if a, ok := i.API[mux.Vars(r)["api"]]; ok {
+		a.Generator.Used.Clear()
+		return
+	}
+
+	http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 }
 
-func ReloadAPI(w http.ResponseWriter, r *http.Request) {
+const (
+	paramAdj  = "adj"
+	paramAdv  = "adv"
+	paramName = "name"
+)
+
+// AddSeed adds a seed to a specific api endpoint
+// note that duplicate seed is explicitely allowed in order to allow
+// for increasing odds as well as to allow some names to pop up twice
+func (i *Instance) AddSeed(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-	w.WriteHeader(http.StatusOK)
+	param := r.URL.Query()
+	if len(param) < 2 {
+		http.Error(w, "AddSeed requires add least two parameters ?type={adj, adv, name}&value=v1,v2", http.StatusBadRequest)
+		return
+	}
+	seedType := param["type"]
+	if seedType != nil {
+		value := param["value"]
+		if value == nil || len(value) < 1 {
+			http.Error(w, "AddSeed requires at least one inserted value", http.StatusBadRequest)
+			return
+		}
+
+		if a, ok := i.API[mux.Vars(r)["api"]]; ok {
+			if seedType[0] == paramAdj {
+				a.Generator.Adjectives = append(a.Generator.Adjectives, value...)
+			} else if seedType[0] == paramAdv {
+				a.Generator.Adverbs = append(a.Generator.Adverbs, value...)
+			} else if seedType[0] == paramName {
+				a.Generator.Names = append(a.Generator.Names, value...)
+			} else {
+				http.Error(w, "AddSeed requires a specified type in {adj, adv, name}", http.StatusBadRequest)
+			}
+		} else {
+			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+		}
+	}
 }
 
-func RemoveSeed(w http.ResponseWriter, r *http.Request) {
+// RemoveSeed removes a seed to a specific api endpoint
+func (i *Instance) RemoveSeed(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	w.WriteHeader(http.StatusOK)
 }

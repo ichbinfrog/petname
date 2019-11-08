@@ -6,27 +6,25 @@ import (
 
 // API represents an API access point
 type API struct {
-	Name      string              `json:"name"`
-	Lock      bool                `json:"lock"`
-	Token     []string            `json:"token,omitempty"`
-	Generator generator.Generator `json:"generator,omitempty"`
+	Name      string               `json:"name"`
+	Lock      bool                 `json:"lock"`
+	Token     []string             `json:"token,omitempty"`
+	Generator *generator.Generator `json:"generator,omitempty"`
 }
 
 // SetupAPI sets up an API
 func (i *Instance) SetupAPI(name string, lock bool, template string, separator string) bool {
-	for _, a := range i.API {
-		if name == a.Name {
-			return false
-		}
+	if _, ok := i.API[name]; ok {
+		return false
 	}
 
 	api := API{
 		Name:      name,
 		Lock:      lock,
 		Token:     []string{},
-		Generator: generator.Generator{},
+		Generator: &generator.Generator{},
 	}
 	api.Generator.New(template, name, separator)
-	i.API = append(i.API, api)
+	i.API[name] = api
 	return true
 }

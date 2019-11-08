@@ -70,6 +70,12 @@ func (n *Node) insert(k int) {
 	}
 }
 
+// Clear deallocates a tree
+func (t *Tree) Clear() {
+	t.Root = nil
+	t.Depth = 0
+}
+
 // Search finds a consecutive series of int in the binary tree
 func (t *Tree) Search(k []int) bool {
 	if t == nil || t.Root == nil || len(k) > t.Depth {

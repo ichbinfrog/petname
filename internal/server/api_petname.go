@@ -4,16 +4,34 @@ import (
 	"encoding/json"
 	"github.com/gorilla/mux"
 	"net/http"
+	"strconv"
 )
 
+// GetPetname returns petname when queried
 func (i *Instance) GetPetname(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-	for _, a := range i.API {
-		if a.Name == mux.Vars(r)["api"] {
-			json.NewEncoder(w).Encode(a.Generator.Get())
-			w.WriteHeader(http.StatusOK)
-			return
+	query := r.URL.Query()
+	nb := 1
+
+	if query["amount"] != nil && len(query["amount"]) == 1 {
+		nb, err := strconv.Atoi(query["amount"][0])
+		if err != nil {
+			http.Error(w, "Amount parameter must be positive", http.StatusBadRequest)
+		}
+
+		if nb < 0 {
+			http.Error(w, "/get/{api} : amount must be > 0", http.StatusBadRequest)
 		}
 	}
-	w.WriteHeader(http.StatusNotFound)
+
+	if a, ok := i.API[mux.Vars(r)["api"]]; ok {
+		g := make([]string, nb)
+		for i := 0; i < nb; i++ {
+			g[i] = a.Generator.Get()
+		}
+		json.NewEncoder(w).Encode(g)
+		return
+	}
+
+	http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 }

@@ -7,16 +7,19 @@ import (
 // Instance is a structure that stores the router
 type Instance struct {
 	Router *mux.Router
-	API    []API
+	API    map[string]API
 }
 
+// SetupRouter generates the initial router configurations
+// for the petname API server
 func (i *Instance) SetupRouter() {
 	i.Router = mux.NewRouter()
+	i.API = make(map[string]API)
 	i.SetupAPI("default", false, "{{ .Adverb }}{{ .Adjective }}{{ .Name }}", "~")
 
 	i.Router.
 		Name("GetHealth").
-		Path("/v1/health").
+		Path("/health").
 		HandlerFunc(HealthGet)
 
 	i.Router.
@@ -26,22 +29,26 @@ func (i *Instance) SetupRouter() {
 
 	i.Router.
 		Name("AddSeed").
-		Path("/v1/api/{api}/add").
-		HandlerFunc(AddSeed)
+		Path("/api/{api}/add").
+		HandlerFunc(i.AddSeed)
 
 	i.Router.
 		Name("ReloadAPI").
-		Path("/v1/api/{api}/reload").
-		HandlerFunc(ReloadAPI)
+		Path("/api/{api}/reload").
+		HandlerFunc(i.ReloadAPI)
 
 	i.Router.
 		Name("RemoveSeed").
-		Path("/v1/api/{api}/remove").
-		HandlerFunc(RemoveSeed)
+		Path("/api/{api}/remove").
+		HandlerFunc(i.RemoveSeed)
 
 	i.Router.
-		Name("GetAllAPI").
-		Path("/v1/api/{api}").
-		HandlerFunc(GetAllAPI)
+		Name("GetInfoAPI").
+		Path("/api/{api}").
+		HandlerFunc(i.GetInfoAPI)
 
+	i.Router.
+		Name("AddAPI").
+		Path("/api").
+		HandlerFunc(i.AddAPI)
 }
