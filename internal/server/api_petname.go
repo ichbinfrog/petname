@@ -11,10 +11,11 @@ import (
 func (i *Instance) GetPetname(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	query := r.URL.Query()
+	var err error
 	nb := 1
 
 	if query["amount"] != nil && len(query["amount"]) == 1 {
-		nb, err := strconv.Atoi(query["amount"][0])
+		nb, err = strconv.Atoi(query["amount"][0])
 		if err != nil {
 			http.Error(w, "Amount parameter must be positive", http.StatusBadRequest)
 		}
@@ -25,14 +26,15 @@ func (i *Instance) GetPetname(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if a, ok := i.API[mux.Vars(r)["api"]]; ok {
-		g := make([]string, nb)
-		var err error
-		for i := 0; i < nb; i++ {
-			g[i], err = a.Generator.Get()
+		var g []string
 
+		for i := 0; i < nb; i++ {
+			s, err := a.Generator.Get()
 			if err != nil {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
 			}
+			g = append(g, s)
 		}
 		json.NewEncoder(w).Encode(g)
 		return

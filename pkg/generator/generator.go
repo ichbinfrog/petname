@@ -16,7 +16,6 @@ import (
 type Generator struct {
 	Name          string
 	Used          map[string]bool
-	TemplateMap   *template.FuncMap
 	Template      *template.Template
 	Adjectives    []string
 	Adverbs       []string
@@ -89,7 +88,7 @@ func (g *Generator) Get() (string, error) {
 
 		petname := buf.String()
 		if _, ok := g.Used[petname]; !ok {
-			g.Used[petname] = false
+			g.Used[petname] = true
 			return petname, nil
 		}
 	}

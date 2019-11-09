@@ -17,7 +17,7 @@ type Instance struct {
 func (i *Instance) SetupRouter() {
 	i.Router = mux.NewRouter()
 	i.API = make(map[string]API)
-	i.SetupAPI("default", false, "{{ .Adverb }}{{ .Adjective }}{{ .Name }}")
+	i.SetupAPI("default", false, "{{ Adverb }}-{{ Adjective }}-{{ Name }}")
 
 	i.Router.
 		Name("GetHealth").
