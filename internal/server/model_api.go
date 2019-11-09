@@ -13,7 +13,7 @@ type API struct {
 }
 
 // SetupAPI sets up an API
-func (i *Instance) SetupAPI(name string, lock bool, template string, separator string) bool {
+func (i *Instance) SetupAPI(name string, lock bool, template string) bool {
 	if _, ok := i.API[name]; ok {
 		return false
 	}
@@ -24,7 +24,7 @@ func (i *Instance) SetupAPI(name string, lock bool, template string, separator s
 		Token:     []string{},
 		Generator: &generator.Generator{},
 	}
-	api.Generator.New(template, name, separator)
+	api.Generator.New(template, name)
 	i.API[name] = api
 	return true
 }

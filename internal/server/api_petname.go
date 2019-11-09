@@ -26,8 +26,13 @@ func (i *Instance) GetPetname(w http.ResponseWriter, r *http.Request) {
 
 	if a, ok := i.API[mux.Vars(r)["api"]]; ok {
 		g := make([]string, nb)
+		var err error
 		for i := 0; i < nb; i++ {
-			g[i] = a.Generator.Get()
+			g[i], err = a.Generator.Get()
+
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+			}
 		}
 		json.NewEncoder(w).Encode(g)
 		return

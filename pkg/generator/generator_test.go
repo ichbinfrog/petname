@@ -9,36 +9,41 @@ func TestGeneratorNew(t *testing.T) {
 	g := &Generator{}
 
 	// Fail template creation
-	g.New("{{.a}}", "name", "+")
-	if len(g.TemplateInterface) != 0 {
-		t.Errorf("Templating should fail when unknown variable {{.a}} is given")
-	}
-
-	// Error when template broken
-	g.New("{{ .. }}", "name", "+")
-	if len(g.TemplateInterface) != 0 {
-		t.Errorf("Templating succeed when it should have failed {{ .. }}")
+	err := g.New("{{..}}", "name1")
+	if err == nil {
+		t.Errorf("[tpl {{..}}] Templating should have failed")
 	}
 
 	// Successfully create template
-	g.New("{{ .Adverb }}{{ .Name }}{{ .Adjective }}{{ .Adjective }}", "name", "+")
-	if len(g.TemplateInterface) == 0 {
-		t.Errorf("Templating failed when it should succeed")
+	err = g.New("{{ Adverb }}{{ Name }}{{ Adjective }}{{ Adjective }}", "name2")
+	if err != nil {
+		t.Errorf("[tpl {{ Adverb }}{{ Name }}{{ Adjective }}{{ Adjective }}] Templating failed with error %s", err.Error())
 	}
 }
 
 func TestGeneratorGet(t *testing.T) {
 	g := &Generator{}
+	tpl := "{{ Adverb }}~{{ Name }}-{{ Adjective }}.{{ Adjective }}"
 	// Test successful name generation
-	g.New("{{ .Adverb }}{{ .Name }}{{ .Adjective }}{{ .Adjective }}", "name", "-")
-	fmt.Println(g.Get())
+	g.New(tpl, "name")
+	s, err := g.Get()
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+	fmt.Printf("[tpl %s] Got %s\n", tpl, s)
 }
 
 func BenchmarkGeneratorGet(b *testing.B) {
 	g := &Generator{}
-	g.New("{{ .Adverb }}{{ .Name }}{{ .Adjective }}", "name", "-")
+	tpl := "{{ Adverb }}--{{ Name }}&&{{ Adjective }}"
+	g.New(tpl, "name")
 
+	fmt.Printf("[tpl %s] Benchmarking...\n", tpl)
 	for i := 0; i < b.N*b.N; i++ {
-		fmt.Println(g.Get())
+		s, err := g.Get()
+		if err != nil {
+			b.Errorf(err.Error())
+		}
+		fmt.Println(s)
 	}
 }

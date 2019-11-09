@@ -28,10 +28,6 @@ func (i *Instance) AddAPI(w http.ResponseWriter, r *http.Request) {
 		err = err + "Template query param cannot be empty, "
 	}
 
-	if param["separator"] == nil || len(param["separator"]) != 1 {
-		err = err + "Separator query param cannot be empty, "
-	}
-
 	if len(err) != 0 {
 		http.Error(w, err, http.StatusBadRequest)
 		return
@@ -43,7 +39,7 @@ func (i *Instance) AddAPI(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if i.SetupAPI(param["name"][0], lock, param["template"][0], param["separator"][0]) {
+	if i.SetupAPI(param["name"][0], lock, param["template"][0]) {
 		w.Write([]byte("Successful insert"))
 	} else {
 		http.Error(w, "Failed insert due to duplicate", http.StatusBadRequest)
@@ -68,7 +64,7 @@ func (i *Instance) ReloadAPI(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 
 	if a, ok := i.API[mux.Vars(r)["api"]]; ok {
-		a.Generator.Used.Clear()
+		a.Generator.Used = map[string]bool{}
 		return
 	}
 
