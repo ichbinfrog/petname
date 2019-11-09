@@ -17,27 +17,27 @@ You can use this server to:
 Using the docker image (recommended):
 ```sh
 # If you want to build your own image
-docker build . -t petname:v0.1.0
+docker build . -t petname:v0.1.1
 
 # If you want to pull directly from dockerhub
-docker pull ichbinfrog/petname:v0.1.0
+docker pull ichbinfrog/petname:v0.1.1
 ```
 
 Using the binary:
 ```sh
 # Assuming you've downloaded the latest release
 # on the github release tab
-chmod +x ./petname:v0.1.0
+chmod +x ./petname:v0.1.1
 
 # If you want to add it to your path
-mv ./petname:v0.1.0 /usr/local/bin/petname
+mv ./petname:v0.1.1 /usr/local/bin/petname
 ```
 
 ## Running
 
 Using the docker image:
 ```sh
-docker run --rm -d --port $PORT:$PORT ichbinfrog/petname:v0.1.0 serve --port $PORT
+docker run --rm -d -p $PORT:$PORT ichbinfrog/petname:v0.1.1 serve --port $PORT
 ```
 
 Using the binary:
