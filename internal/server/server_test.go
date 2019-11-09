@@ -108,17 +108,17 @@ func TestGet(t *testing.T) {
 
 	// Test get handler with positive param with the default api
 	handleGetParam(t, "/get/default", prt, http.StatusOK, false, map[string][]string{
-		"amount": []string{"100"},
+		"amount": {"100"},
 	})
 
 	// Test get handler with negative param with the default api
 	handleGetParam(t, "/get/default", prt, http.StatusBadRequest, false, map[string][]string{
-		"amount": []string{"-100"},
+		"amount": {"-100"},
 	})
 
 	// Test get handler with null param with the default api
 	handleGetParam(t, "/get/default", prt, http.StatusOK, false, map[string][]string{
-		"amount": []string{"0"},
+		"amount": {"0"},
 	})
 
 	// Test reload used map for default API
@@ -132,7 +132,7 @@ func TestGet(t *testing.T) {
 		t.Errorf("[/api/default/reload] Depth should be nil because tree is cleared\n")
 	}
 
-	// Test non existant API reload
+	// Test non existent API reload
 	handleGet(t, "/api/0000000000/reload", prt, http.StatusNotFound, false)
 }
 
@@ -151,26 +151,26 @@ func TestAPI(t *testing.T) {
 
 	// Test add API with failed lock conversion
 	handleGetParam(t, "/api", prt, http.StatusBadRequest, false, map[string][]string{
-		"lock":      []string{"holla"},
-		"name":      []string{"holla"},
-		"template":  []string{"holla"},
-		"separator": []string{"holla"},
+		"lock":      {"holla"},
+		"name":      {"holla"},
+		"template":  {"holla"},
+		"separator": {"holla"},
 	})
 
 	// Test valid API add
 	handleGetParam(t, "/api", prt, http.StatusOK, false, map[string][]string{
-		"lock":      []string{"false"},
-		"name":      []string{"v1"},
-		"template":  []string{"{{ .Name }}{{ .Adverb }}{{ .Adverb }}"},
-		"separator": []string{"~~~~"},
+		"lock":      {"false"},
+		"name":      {"v1"},
+		"template":  {"{{ .Name }}{{ .Adverb }}{{ .Adverb }}"},
+		"separator": {"~~~~"},
 	})
 
 	// Test duplicate API add
 	handleGetParam(t, "/api", prt, http.StatusBadRequest, false, map[string][]string{
-		"lock":      []string{"false"},
-		"name":      []string{"v1"},
-		"template":  []string{"{{ .Name }}{{ .Adverb }}{{ .Adverb }}"},
-		"separator": []string{"~~~~"},
+		"lock":      {"false"},
+		"name":      {"v1"},
+		"template":  {"{{ .Name }}{{ .Adverb }}{{ .Adverb }}"},
+		"separator": {"~~~~"},
 	})
 }
 
@@ -178,33 +178,33 @@ func TestSeed(t *testing.T) {
 	// Test empty seed add
 	handleGetParam(t, "/api/default/add", prt, http.StatusBadRequest, false, map[string][]string{})
 
-	// Test seed add with non existant values
+	// Test seed add with non existent values
 	handleGetParam(t, "/api/default/add", prt, http.StatusBadRequest, false, map[string][]string{
-		"type": []string{"holla"},
+		"type": {"holla"},
 	})
 
-	// Test seed add with non existant API
+	// Test seed add with non existent API
 	handleGetParam(t, "/api/0000000000/add", prt, http.StatusBadRequest, false, map[string][]string{
-		"type": []string{"holla"},
+		"type": {"holla"},
 	})
 
 	// Test empty value type with existing api
 	handleGetParam(t, "/api/default/add", prt, http.StatusBadRequest, true, map[string][]string{
-		"type":  []string{"holla"},
-		"value": []string{},
+		"type":  {"holla"},
+		"value": {},
 	})
 
-	// Test non existant type seed add with default API
+	// Test non existent type seed add with default API
 	handleGetParam(t, "/api/default/add", prt, http.StatusBadRequest, true, map[string][]string{
-		"type":  []string{"holla"},
-		"value": []string{"holla", "como"},
+		"type":  {"holla"},
+		"value": {"holla", "como"},
 	})
 
 	// Test adj seed add with default API
 	oldAdj := len(i.API["default"].Generator.Adjectives)
 	handleGetParam(t, "/api/default/add", prt, http.StatusOK, true, map[string][]string{
-		"type":  []string{"adj"},
-		"value": []string{"holla", "como"},
+		"type":  {"adj"},
+		"value": {"holla", "como"},
 	})
 	if len(i.API["default"].Generator.Adjectives) != oldAdj+2 {
 		t.Errorf("[/api/default/add?type=adj&value=holla&value=como] should have %d entries, but has %d\n", oldAdj+2, len(i.API["default"].Generator.Adjectives))
@@ -213,8 +213,8 @@ func TestSeed(t *testing.T) {
 	// Test adv seed add with default API
 	oldAdv := len(i.API["default"].Generator.Adverbs)
 	handleGetParam(t, "/api/default/add", prt, http.StatusOK, true, map[string][]string{
-		"type":  []string{"adv"},
-		"value": []string{"holla", "como"},
+		"type":  {"adv"},
+		"value": {"holla", "como"},
 	})
 	if len(i.API["default"].Generator.Adverbs) != oldAdv+2 {
 		t.Errorf("[/api/default/add?type=adv&value=holla&value=como] should have %d entries, but has %d\n", oldAdv+2, len(i.API["default"].Generator.Adverbs))
@@ -223,8 +223,8 @@ func TestSeed(t *testing.T) {
 	// Test name seed add with default API
 	oldName := len(i.API["default"].Generator.Names)
 	handleGetParam(t, "/api/default/add", prt, http.StatusOK, true, map[string][]string{
-		"type":  []string{"name"},
-		"value": []string{"holla", "como"},
+		"type":  {"name"},
+		"value": {"holla", "como"},
 	})
 	if len(i.API["default"].Generator.Names) != oldName+2 {
 		t.Errorf("[/api/default/add?type=name&value=holla&value=como] should have %d entries, but has %d\n", oldName+2, len(i.API["default"].Generator.Names))
