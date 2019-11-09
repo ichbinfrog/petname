@@ -1,5 +1,5 @@
 
-# Petname (WIP)
+# Petname
 
 [![Go Report Card](https://goreportcard.com/badge/ichbinfrog/petname)](https://goreportcard.com/report/github.com/ichbinfrog/petname) [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/ichbinfrog/petname/blob/master/LICENSE) [![GoDoc](https://godoc.org/github.com/ichbinfrog/petname?status.svg)](https://godoc.org/github.com/ichbinfrog/petname) ![Build](https://travis-ci.org/ichbinfrog/petname.svg?branch=master) [![codecov](https://codecov.io/gh/ichbinfrog/petname/branch/master/graph/badge.svg)](https://codecov.io/gh/ichbinfrog/petname)
 
@@ -8,7 +8,7 @@ Petname is a server that generates unique petnames (see [RFC](https://tools.ietf
 You can use this server to:
 - Create unique memorable names for your container/processes
 - Dynamically import more names into the server by adding values to a yaml file
-- (**future**) Dynamically add names to the API by querying the API itself
+- Dynamically add names to the API by querying the API itself
 - (**future**) Distributed lightweight API server to handle unique cluster names
 - (**future**) Secure access to the API using Bearer Tokens
 
