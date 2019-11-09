@@ -117,8 +117,13 @@ func TestGet(t *testing.T) {
 	})
 
 	// Test get handler with null param with the default api
-	handleGetParam(t, "/get/default", prt, http.StatusOK, false, map[string][]string{
-		"amount": {"0"},
+	handleGetParam(t, "/get/default", prt, http.StatusBadRequest, false, map[string][]string{
+		"amount": {},
+	})
+
+	// Test get handler with non int param with the default api
+	handleGetParam(t, "/get/default", prt, http.StatusBadRequest, false, map[string][]string{
+		"amount": {"holla"},
 	})
 
 	// Test reload used map for default API
@@ -174,7 +179,7 @@ func TestAPI(t *testing.T) {
 	})
 }
 
-func TestSeed(t *testing.T) {
+func TestAddSeed(t *testing.T) {
 	// Test empty seed add
 	handleGetParam(t, "/api/default/add", prt, http.StatusBadRequest, false, map[string][]string{})
 
@@ -197,6 +202,12 @@ func TestSeed(t *testing.T) {
 	// Test non existent type seed add with default API
 	handleGetParam(t, "/api/default/add", prt, http.StatusBadRequest, true, map[string][]string{
 		"type":  {"holla"},
+		"value": {"holla", "como"},
+	})
+
+	// Test adj seed add with non existent API
+	handleGetParam(t, "/api/0000000000/add", prt, http.StatusNotFound, true, map[string][]string{
+		"type":  {"adj"},
 		"value": {"holla", "como"},
 	})
 
@@ -230,4 +241,65 @@ func TestSeed(t *testing.T) {
 		t.Errorf("[/api/default/add?type=name&value=holla&value=como] should have %d entries, but has %d\n", oldName+2, len(i.API["default"].Generator.Names))
 	}
 
+	//=============================================================================================
+	// Test empty seed remove
+	handleGetParam(t, "/api/default/remove", prt, http.StatusBadRequest, false, map[string][]string{})
+
+	// Test seed remove with non existent values
+	handleGetParam(t, "/api/default/remove", prt, http.StatusBadRequest, false, map[string][]string{
+		"type": {"holla"},
+	})
+
+	// Test seed remove with non existent API
+	handleGetParam(t, "/api/0000000000/remove", prt, http.StatusBadRequest, false, map[string][]string{
+		"type": {"holla"},
+	})
+
+	// Test empty value type with existing api
+	handleGetParam(t, "/api/default/remove", prt, http.StatusBadRequest, true, map[string][]string{
+		"type":  {"holla"},
+		"value": {},
+	})
+
+	// Test non existent type seed add with default API
+	handleGetParam(t, "/api/default/remove", prt, http.StatusBadRequest, true, map[string][]string{
+		"type":  {"holla"},
+		"value": {"holla", "como"},
+	})
+
+	// Test adj seed add with non existent API
+	handleGetParam(t, "/api/0000000000/remove", prt, http.StatusNotFound, true, map[string][]string{
+		"type":  {"adj"},
+		"value": {"holla", "como"},
+	})
+
+	// Test adj seed remove with default API
+	oldAdj = len(i.API["default"].Generator.Adjectives)
+	handleGetParam(t, "/api/default/remove", prt, http.StatusOK, true, map[string][]string{
+		"type":  {"adj"},
+		"value": {"holla", "como"},
+	})
+	if len(i.API["default"].Generator.Adjectives) != oldAdj-2 {
+		t.Errorf("[/api/default/add?type=adj&value=holla&value=como] should have %d entries, but has %d\n", oldAdj-2, len(i.API["default"].Generator.Adjectives))
+	}
+
+	// Test adv seed remove with default API
+	oldAdv = len(i.API["default"].Generator.Adverbs)
+	handleGetParam(t, "/api/default/remove", prt, http.StatusOK, true, map[string][]string{
+		"type":  {"adv"},
+		"value": {"holla", "como"},
+	})
+	if len(i.API["default"].Generator.Adverbs) != oldAdv-2 {
+		t.Errorf("[/api/default/add?type=adv&value=holla&value=como] should have %d entries, but has %d\n", oldAdv-2, len(i.API["default"].Generator.Adverbs))
+	}
+
+	// Test name seed remove with default API
+	oldName = len(i.API["default"].Generator.Names)
+	handleGetParam(t, "/api/default/remove", prt, http.StatusOK, true, map[string][]string{
+		"type":  {"name"},
+		"value": {"holla", "como"},
+	})
+	if len(i.API["default"].Generator.Names) != oldName-2 {
+		t.Errorf("[/api/default/add?type=name&value=holla&value=como] should have %d entries, but has %d\n", oldName-2, len(i.API["default"].Generator.Names))
+	}
 }

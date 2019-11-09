@@ -114,5 +114,50 @@ func (i *Instance) AddSeed(w http.ResponseWriter, r *http.Request) {
 // RemoveSeed removes a seed to a specific api endpoint
 func (i *Instance) RemoveSeed(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-	w.WriteHeader(http.StatusOK)
+	param := r.URL.Query()
+	if len(param) < 2 {
+		http.Error(w, "RemoveSeed requires add least two parameters ?type={adj, adv, name}&value=v1,v2", http.StatusBadRequest)
+		return
+	}
+
+	seedType := param["type"]
+	if seedType != nil {
+		value := param["value"]
+		if value == nil || len(value) < 1 {
+			http.Error(w, "RemoveSeed requires at least one inserted value", http.StatusBadRequest)
+			return
+		}
+
+		if a, ok := i.API[mux.Vars(r)["api"]]; ok {
+			if seedType[0] == paramAdj {
+				a.Generator.Adjectives = removeSlice(a.Generator.Adjectives, value)
+			} else if seedType[0] == paramAdv {
+				a.Generator.Adverbs = removeSlice(a.Generator.Adverbs, value)
+			} else if seedType[0] == paramName {
+				a.Generator.Names = removeSlice(a.Generator.Names, value)
+			} else {
+				http.Error(w, "AddSeed requires a specified type in {adj, adv, name}", http.StatusBadRequest)
+			}
+		} else {
+			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+		}
+	}
+}
+
+func removeSlice(a []string, k []string) []string {
+	for _, v := range k {
+		a = removeValue(a, v)
+	}
+	return a
+}
+
+func removeValue(a []string, k string) []string {
+	for i, v := range a {
+		if v == k {
+			copy(a[i:], a[i+1:])
+			a[len(a)-1] = ""
+			return a[:len(a)-1]
+		}
+	}
+	return a
 }
