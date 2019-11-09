@@ -55,14 +55,14 @@ Global Flags:
 
 ## Querying the API
 
-| Endpoint       | Description                                                         |
-| -------------- | ------------------------------------------------------------------- |
-| `/get/v1`      | Default endpoint present, returns a petname                         |
-| `/get/v1/n`    | Default endpoint present, returns n petnames                        |
-| `/api`         | Create a new API endpoint                                           |
-| `/get/{api}`   | return a petname on an added API                                    |
-| `/get/{api}/n` | return n petnames on an added API                                   |
-| `/reload`      | reloads the configuration if changes to the .seed.yaml file is done |
+| Endpoint                                            | Description                                                           |
+| --------------------------------------------------- | --------------------------------------------------------------------- |
+| `/get/default?amount=n`                             | Default endpoint present, returns n petname                           |
+| `/api?lock={lock}&name={name}&template={template}`  | Create a new API endpoint                                             |
+| `/api/{api}/add?type={adj,adv,name}&value[]=...`    | Appends a seed adjective, adverb or name to the specific targeted API |
+| `/api/{api}/reload`                                 | Clear the used binary tree for the specific API                       |
+| `/api/{api}/delete?type={adj,adv,name}&value[]=...` | Removes a seed adjective, adverb or name to the specific targeted API |
+| `/health`                                           | Health endpoint always returns `200`                                  |
 
 In order to create an API endpoint, you have to send a GET request with the query parameters:
 - `name`: the name of the desired endpoints (will result in the `/get/{name}` API being available)
@@ -75,7 +75,7 @@ For example with golang:
 // Creates a request to send to the /api endpoint
 req, err := http.NewRequest("GET", "http://localhost:8000/api", nil)
 if err != nil {
-  t.Errorf(err.Error())
+  panic(err)
 }
 
 // Creates a http client
