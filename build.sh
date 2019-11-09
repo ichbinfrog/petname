@@ -41,6 +41,5 @@ push() {
   hub release create $releases "$1"
 }
 
-
 build
 push "$1"
