@@ -78,7 +78,7 @@ const (
 )
 
 // AddSeed adds a seed to a specific api endpoint
-// note that duplicate seed is explicitely allowed in order to allow
+// note that duplicate seed is explicitly allowed in order to allow
 // for increasing odds as well as to allow some names to pop up twice
 func (i *Instance) AddSeed(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
