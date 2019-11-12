@@ -85,8 +85,7 @@ client := &http.Client{}
 q := req.URL.Query()
 q.Add("name", "v2")
 q.Add("lock", "false")
-q.Add("separator", "~")
-q.Add("template", "{{.Name}}{{.Name}}{{.Adjective}}")
+q.Add("template", "{{.Name}}~{{.Name}}~{{.Adjective}}")
 
 // Perform the request
 r, reqErr := client.Do(req)
