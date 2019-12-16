@@ -15,6 +15,8 @@ require (
 	github.com/go-swagger/go-swagger v0.21.0 // indirect
 	github.com/gorilla/mux v1.7.3
 	github.com/jessevdk/go-flags v1.4.0
+	github.com/klauspost/compress v1.9.4 // indirect
+	github.com/klauspost/cpuid v1.2.2 // indirect
 	github.com/mailru/easyjson v0.7.0 // indirect
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/pelletier/go-toml v1.6.0 // indirect
@@ -22,6 +24,7 @@ require (
 	github.com/spf13/cobra v0.0.5
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/spf13/viper v1.5.0
+	github.com/valyala/fasthttp v1.6.0 // indirect
 	go.mongodb.org/mongo-driver v1.1.3 // indirect
 	golang.org/x/net v0.0.0-20191105084925-a882066a44e0
 	golang.org/x/sys v0.0.0-20191105231009-c1f44814a5cd // indirect

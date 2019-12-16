@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"testing"
+	"time"
 )
 
 const (
@@ -20,6 +21,30 @@ func init() {
 	go func() {
 		http.ListenAndServe(":8000", i.Router)
 	}()
+}
+
+func BenchmarkGet(b *testing.B) {
+	client := &http.Client{Timeout: time.Second * 2}
+	errorRate := 0
+
+	for n := 0; n < b.N; n++ {
+		// Test get handler with positive param with the default api
+		req, err := http.NewRequest("GET", "http://localhost:"+prt+"/get/default", nil)
+		if err != nil {
+			errorRate++
+			break
+		}
+
+		q := req.URL.Query()
+		q.Add("amount", "100")
+		req.URL.RawQuery = q.Encode()
+		r, reqErr := client.Do(req)
+		if reqErr != nil || r.StatusCode != http.StatusOK {
+			errorRate++
+		}
+		req.Body.Close()
+	}
+	b.ReportMetric(float64(errorRate)/float64(b.N*100), "errors/operation")
 }
 
 func handleReturn(t *testing.T, p string, prt string, code int) {
