@@ -3,8 +3,10 @@ package server
 import (
 	"fmt"
 	"github.com/gorilla/mux"
+	"github.com/ichbinfrog/petname/pkg/response"
 	"net/http"
 	"strconv"
+	"sync"
 )
 
 // AddAPI adds an API endpoint
@@ -13,19 +15,19 @@ func (i *Instance) AddAPI(w http.ResponseWriter, r *http.Request) {
 	param := r.URL.Query()
 	err := ""
 	if len(param) < 1 {
-		err = err + "Query param cannot be empty, "
+		err = err + response.QueryEmptyParam.Error()
 	}
 
 	if param["lock"] == nil || len(param["lock"]) != 1 {
-		err = err + "Lock query param cannot be empty, "
+		err = err + response.QueryEmptyLock.Error()
 	}
 
 	if param["name"] == nil || len(param["name"]) != 1 {
-		err = err + "Name query param cannot be empty, "
+		err = err + response.QueryEmptyName.Error()
 	}
 
 	if param["template"] == nil || len(param["template"]) != 1 {
-		err = err + "Template query param cannot be empty, "
+		err = err + response.QueryEmptyTemplate.Error()
 	}
 
 	if len(err) != 0 {
@@ -42,7 +44,7 @@ func (i *Instance) AddAPI(w http.ResponseWriter, r *http.Request) {
 	if i.SetupAPI(param["name"][0], lock, param["template"][0]) {
 		w.Write([]byte("Successful insert"))
 	} else {
-		http.Error(w, "Failed insert due to duplicate", http.StatusBadRequest)
+		http.Error(w, response.APIAddDuplicateError.Error(), http.StatusBadRequest)
 	}
 }
 
@@ -64,7 +66,7 @@ func (i *Instance) ReloadAPI(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 
 	if a, ok := i.API[mux.Vars(r)["api"]]; ok {
-		a.Generator.Used = map[string]bool{}
+		a.Generator.Used = new(sync.Map)
 		return
 	}
 
@@ -84,14 +86,14 @@ func (i *Instance) AddSeed(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	param := r.URL.Query()
 	if len(param) < 2 {
-		http.Error(w, "AddSeed requires add least two parameters ?type={adj, adv, name}&value=v1,v2", http.StatusBadRequest)
+		http.Error(w, response.SeedAddParamRequired.Error(), http.StatusBadRequest)
 		return
 	}
 	seedType := param["type"]
 	if seedType != nil {
 		value := param["value"]
 		if value == nil || len(value) < 1 {
-			http.Error(w, "AddSeed requires at least one inserted value", http.StatusBadRequest)
+			http.Error(w, response.SeedAddValueRequired.Error(), http.StatusBadRequest)
 			return
 		}
 
@@ -103,7 +105,7 @@ func (i *Instance) AddSeed(w http.ResponseWriter, r *http.Request) {
 			} else if seedType[0] == paramName {
 				a.Generator.Names = append(a.Generator.Names, value...)
 			} else {
-				http.Error(w, "AddSeed requires a specified type in {adj, adv, name}", http.StatusBadRequest)
+				http.Error(w, response.SeedAddTypeRequired.Error(), http.StatusBadRequest)
 			}
 		} else {
 			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
@@ -116,7 +118,7 @@ func (i *Instance) RemoveSeed(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	param := r.URL.Query()
 	if len(param) < 2 {
-		http.Error(w, "RemoveSeed requires add least two parameters ?type={adj, adv, name}&value=v1,v2", http.StatusBadRequest)
+		http.Error(w, response.SeedRmParamRequired.Error(), http.StatusBadRequest)
 		return
 	}
 
@@ -124,7 +126,7 @@ func (i *Instance) RemoveSeed(w http.ResponseWriter, r *http.Request) {
 	if seedType != nil {
 		value := param["value"]
 		if value == nil || len(value) < 1 {
-			http.Error(w, "RemoveSeed requires at least one inserted value", http.StatusBadRequest)
+			http.Error(w, response.SeedRmValueRequired.Error(), http.StatusBadRequest)
 			return
 		}
 
@@ -136,7 +138,7 @@ func (i *Instance) RemoveSeed(w http.ResponseWriter, r *http.Request) {
 			} else if seedType[0] == paramName {
 				a.Generator.Names = removeSlice(a.Generator.Names, value)
 			} else {
-				http.Error(w, "AddSeed requires a specified type in {adj, adv, name}", http.StatusBadRequest)
+				http.Error(w, response.SeedRmTypeRequired.Error(), http.StatusBadRequest)
 			}
 		} else {
 			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)

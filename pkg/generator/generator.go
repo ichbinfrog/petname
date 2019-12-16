@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"math/rand"
 	"regexp"
+	"sync"
 	"text/template"
 	"time"
 )
@@ -15,7 +16,7 @@ import (
 // generation of a petname
 type Generator struct {
 	Name          string
-	Used          map[string]bool
+	Used          *sync.Map
 	Template      *template.Template
 	Adjectives    []string
 	Adverbs       []string
@@ -74,7 +75,7 @@ func (g *Generator) New(t string, n string) error {
 		return err
 	}
 	g.Template = tpl
-	g.Used = make(map[string]bool)
+	g.Used = new(sync.Map)
 	return nil
 }
 
@@ -87,8 +88,7 @@ func (g *Generator) Get() (string, error) {
 		}
 
 		petname := buf.String()
-		if _, ok := g.Used[petname]; !ok {
-			g.Used[petname] = true
+		if _, ok := g.Used.LoadOrStore(petname, true); !ok {
 			return petname, nil
 		}
 	}

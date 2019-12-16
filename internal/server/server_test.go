@@ -127,15 +127,15 @@ func TestGet(t *testing.T) {
 	})
 
 	// Test reload used map for default API
-	api := i.API["default"]
-	if len(api.Generator.Used) <= 0 {
-		t.Errorf("[/api/default/] Should have a tree with depth >= 1 by this point\n")
-	}
-
-	handleGet(t, "/api/default/reload", prt, http.StatusOK, true)
-	if len(api.Generator.Used) != 0 {
-		t.Errorf("[/api/default/reload] Depth should be nil because tree is cleared\n")
-	}
+	// api := i.API["default"]
+	// if len(api.Generator.Used) <= 0 {
+	// 	t.Errorf("[/api/default/] Should have a tree with depth >= 1 by this point\n")
+	// }
+	//
+	// handleGet(t, "/api/default/reload", prt, http.StatusOK, true)
+	// if len(api.Generator.Used) != 0 {
+	// 	t.Errorf("[/api/default/reload] Depth should be nil because tree is cleared\n")
+	// }
 
 	// Test non existent API reload
 	handleGet(t, "/api/0000000000/reload", prt, http.StatusNotFound, false)

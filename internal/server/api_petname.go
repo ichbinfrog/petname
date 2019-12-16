@@ -3,8 +3,10 @@ package server
 import (
 	"encoding/json"
 	"github.com/gorilla/mux"
+	"github.com/ichbinfrog/petname/pkg/response"
 	"net/http"
 	"strconv"
+	"sync"
 )
 
 // GetPetname returns petname when queried
@@ -17,25 +19,39 @@ func (i *Instance) GetPetname(w http.ResponseWriter, r *http.Request) {
 	if query["amount"] != nil && len(query["amount"]) == 1 {
 		nb, err = strconv.Atoi(query["amount"][0])
 		if err != nil {
-			http.Error(w, "Amount parameter must be positive", http.StatusBadRequest)
+			http.Error(w, response.QueryAmountInvalid.Error(), http.StatusBadRequest)
 		}
 
 		if nb < 0 {
-			http.Error(w, "/get/{api} : amount must be > 0", http.StatusBadRequest)
+			http.Error(w, response.QueryAmountInvalid.Error(), http.StatusBadRequest)
 		}
 	}
 
 	if a, ok := i.API[mux.Vars(r)["api"]]; ok {
 		var g []string
+		var wg sync.WaitGroup
+		q := make(chan string, 1)
 
 		for i := 0; i < nb; i++ {
-			s, err := a.Generator.Get()
-			if err != nil {
-				http.Error(w, err.Error(), http.StatusInternalServerError)
-				return
-			}
-			g = append(g, s)
+			wg.Add(1)
+			go func() {
+				s, err := a.Generator.Get()
+				if err != nil {
+					http.Error(w, err.Error(), http.StatusInternalServerError)
+					q <- ""
+				}
+				q <- s
+			}()
 		}
+
+		go func() {
+			for s := range q {
+				g = append(g, s)
+				wg.Done()
+			}
+		}()
+
+		wg.Wait()
 		json.NewEncoder(w).Encode(g)
 		return
 	}
