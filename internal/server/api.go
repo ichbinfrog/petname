@@ -15,19 +15,19 @@ func (i *Instance) AddAPI(w http.ResponseWriter, r *http.Request) {
 	param := r.URL.Query()
 	err := ""
 	if len(param) < 1 {
-		err = err + response.QueryEmptyParam.Error()
+		err = err + response.QueryEmptyParam
 	}
 
 	if param["lock"] == nil || len(param["lock"]) != 1 {
-		err = err + response.QueryEmptyLock.Error()
+		err = err + response.QueryEmptyLock
 	}
 
 	if param["name"] == nil || len(param["name"]) != 1 {
-		err = err + response.QueryEmptyName.Error()
+		err = err + response.QueryEmptyName
 	}
 
 	if param["template"] == nil || len(param["template"]) != 1 {
-		err = err + response.QueryEmptyTemplate.Error()
+		err = err + response.QueryEmptyTemplate
 	}
 
 	if len(err) != 0 {
@@ -44,7 +44,7 @@ func (i *Instance) AddAPI(w http.ResponseWriter, r *http.Request) {
 	if i.SetupAPI(param["name"][0], lock, param["template"][0]) {
 		w.Write([]byte("Successful insert"))
 	} else {
-		http.Error(w, response.APIAddDuplicateError.Error(), http.StatusBadRequest)
+		http.Error(w, response.APIAddDuplicateError, http.StatusBadRequest)
 	}
 }
 
@@ -86,14 +86,14 @@ func (i *Instance) AddSeed(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	param := r.URL.Query()
 	if len(param) < 2 {
-		http.Error(w, response.SeedAddParamRequired.Error(), http.StatusBadRequest)
+		http.Error(w, response.SeedAddParamRequired, http.StatusBadRequest)
 		return
 	}
 	seedType := param["type"]
 	if seedType != nil {
 		value := param["value"]
 		if value == nil || len(value) < 1 {
-			http.Error(w, response.SeedAddValueRequired.Error(), http.StatusBadRequest)
+			http.Error(w, response.SeedAddValueRequired, http.StatusBadRequest)
 			return
 		}
 
@@ -105,7 +105,7 @@ func (i *Instance) AddSeed(w http.ResponseWriter, r *http.Request) {
 			} else if seedType[0] == paramName {
 				a.Generator.Names = append(a.Generator.Names, value...)
 			} else {
-				http.Error(w, response.SeedAddTypeRequired.Error(), http.StatusBadRequest)
+				http.Error(w, response.SeedAddTypeRequired, http.StatusBadRequest)
 			}
 		} else {
 			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
@@ -118,7 +118,7 @@ func (i *Instance) RemoveSeed(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	param := r.URL.Query()
 	if len(param) < 2 {
-		http.Error(w, response.SeedRmParamRequired.Error(), http.StatusBadRequest)
+		http.Error(w, response.SeedRmParamRequired, http.StatusBadRequest)
 		return
 	}
 
@@ -126,7 +126,7 @@ func (i *Instance) RemoveSeed(w http.ResponseWriter, r *http.Request) {
 	if seedType != nil {
 		value := param["value"]
 		if value == nil || len(value) < 1 {
-			http.Error(w, response.SeedRmValueRequired.Error(), http.StatusBadRequest)
+			http.Error(w, response.SeedRmValueRequired, http.StatusBadRequest)
 			return
 		}
 
@@ -138,7 +138,7 @@ func (i *Instance) RemoveSeed(w http.ResponseWriter, r *http.Request) {
 			} else if seedType[0] == paramName {
 				a.Generator.Names = removeSlice(a.Generator.Names, value)
 			} else {
-				http.Error(w, response.SeedRmTypeRequired.Error(), http.StatusBadRequest)
+				http.Error(w, response.SeedRmTypeRequired, http.StatusBadRequest)
 			}
 		} else {
 			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)

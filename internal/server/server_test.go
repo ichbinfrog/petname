@@ -23,7 +23,7 @@ func init() {
 	}()
 }
 
-func BenchmarkGet(b *testing.B) {
+func BenchmarkNGet(b *testing.B) {
 	client := &http.Client{Timeout: time.Second * 2}
 	errorRate := 0
 
@@ -42,9 +42,8 @@ func BenchmarkGet(b *testing.B) {
 		if reqErr != nil || r.StatusCode != http.StatusOK {
 			errorRate++
 		}
-		req.Body.Close()
+		r.Body.Close()
 	}
-	b.ReportMetric(float64(errorRate)/float64(b.N*100), "errors/operation")
 }
 
 func handleReturn(t *testing.T, p string, prt string, code int) {

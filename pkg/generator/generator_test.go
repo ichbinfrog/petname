@@ -40,9 +40,10 @@ func BenchmarkGeneratorGet(b *testing.B) {
 
 	fmt.Printf("[tpl %s] Benchmarking...\n", tpl)
 	for i := 0; i < b.N*b.N; i++ {
-		_, err := g.Get()
+		s, err := g.Get()
 		if err != nil {
 			b.Errorf(err.Error())
 		}
+		fmt.Println(s)
 	}
 }

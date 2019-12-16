@@ -19,11 +19,11 @@ func (i *Instance) GetPetname(w http.ResponseWriter, r *http.Request) {
 	if query["amount"] != nil && len(query["amount"]) == 1 {
 		nb, err = strconv.Atoi(query["amount"][0])
 		if err != nil {
-			http.Error(w, response.QueryAmountInvalid.Error(), http.StatusBadRequest)
+			http.Error(w, response.QueryAmountInvalid, http.StatusBadRequest)
 		}
 
 		if nb < 0 {
-			http.Error(w, response.QueryAmountInvalid.Error(), http.StatusBadRequest)
+			http.Error(w, response.QueryAmountInvalid, http.StatusBadRequest)
 		}
 	}
 
