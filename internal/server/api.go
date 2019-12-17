@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/ichbinfrog/petname/pkg/response"
 	"github.com/valyala/fasthttp"
-	"log"
 	"net/http"
 )
 
@@ -85,9 +84,6 @@ func (i *Instance) AddSeed(ctx *fasthttp.RequestCtx) {
 	seedType := string(param.Peek("type"))
 	if len(seedType) != 0 {
 		value := param.PeekMulti("value")
-		for _, v := range value {
-			log.Println(ctx.URI(), len(value), string(v))
-		}
 		if len(value) == 0 || (len(value) == 1 && string(value[0]) == "") {
 			ctx.Error(response.SeedAddValueRequired, http.StatusBadRequest)
 			return
@@ -96,10 +92,13 @@ func (i *Instance) AddSeed(ctx *fasthttp.RequestCtx) {
 		if a, ok := i.API[ctx.UserValue("api").(string)]; ok {
 			if seedType == paramAdj {
 				a.Generator.Adjectives = appendSlice(a.Generator.Adjectives, value)
+				a.Generator.AvailableAdj++
 			} else if seedType == paramAdv {
 				a.Generator.Adverbs = appendSlice(a.Generator.Adverbs, value)
+				a.Generator.AvailableAdv++
 			} else if seedType == paramName {
 				a.Generator.Names = appendSlice(a.Generator.Names, value)
+				a.Generator.AvailableName++
 			} else {
 				ctx.Error(response.SeedAddTypeRequired, http.StatusBadRequest)
 			}
@@ -129,10 +128,13 @@ func (i *Instance) RemoveSeed(ctx *fasthttp.RequestCtx) {
 		if a, ok := i.API[ctx.UserValue("api").(string)]; ok {
 			if seedType == paramAdj {
 				a.Generator.Adjectives = removeSlice(a.Generator.Adjectives, value)
+				a.Generator.AvailableAdj--
 			} else if seedType == paramAdv {
 				a.Generator.Adverbs = removeSlice(a.Generator.Adverbs, value)
+				a.Generator.AvailableAdv--
 			} else if seedType == paramName {
 				a.Generator.Names = removeSlice(a.Generator.Names, value)
+				a.Generator.AvailableName--
 			} else {
 				ctx.Error(response.SeedRmTypeRequired, http.StatusBadRequest)
 			}

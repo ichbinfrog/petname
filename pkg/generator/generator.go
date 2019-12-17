@@ -44,15 +44,15 @@ func init() {
 }
 
 func (g *Generator) getName() string {
-	return g.Names[rand.Intn(len(g.Names))]
+	return g.Names[rand.Intn(g.AvailableName)]
 }
 
 func (g *Generator) getAdjective() string {
-	return g.Adjectives[rand.Intn(len(g.Adjectives))]
+	return g.Adjectives[rand.Intn(g.AvailableAdj)]
 }
 
 func (g *Generator) getAdverb() string {
-	return g.Names[rand.Intn(len(g.Adverbs))]
+	return g.Names[rand.Intn(g.AvailableAdv)]
 }
 
 // New generates a new generator from a given template

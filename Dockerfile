@@ -1,5 +1,5 @@
 ARG VERSION="v0.0.1"
-ARG GO_VERSION="1.13.1"
+ARG GO_VERSION="1.13.5"
 
 # Builder image
 FROM golang:${GO_VERSION} as petname-builder

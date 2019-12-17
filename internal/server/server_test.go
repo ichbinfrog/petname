@@ -149,8 +149,6 @@ func TestGet(t *testing.T) {
 
 	// Test existent API reload
 	handleGet(t, "/api/default/reload", prt, http.StatusOK, false)
-
-	// Test overload API
 }
 
 func TestAPI(t *testing.T) {
