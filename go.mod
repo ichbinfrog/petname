@@ -20,6 +20,7 @@ require (
 	github.com/klauspost/cpuid v1.2.2 // indirect
 	github.com/mailru/easyjson v0.7.0 // indirect
 	github.com/mitchellh/go-homedir v1.1.0
+	github.com/patrickmn/go-cache v2.1.0+incompatible
 	github.com/pelletier/go-toml v1.6.0 // indirect
 	github.com/securego/gosec v0.0.0-20191031105617-99170e0d765b // indirect
 	github.com/spf13/cobra v0.0.5

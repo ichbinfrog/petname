@@ -5,9 +5,9 @@ package generator
 import (
 	"bytes"
 	"fmt"
+	"github.com/patrickmn/go-cache"
 	"math/rand"
 	"regexp"
-	"sync"
 	"text/template"
 	"time"
 )
@@ -16,7 +16,7 @@ import (
 // generation of a petname
 type Generator struct {
 	Name          string
-	Used          *sync.Map
+	Used          *cache.Cache
 	Template      *template.Template
 	Adjectives    []string
 	Adverbs       []string
@@ -75,7 +75,8 @@ func (g *Generator) New(t string, n string) error {
 		return err
 	}
 	g.Template = tpl
-	g.Used = new(sync.Map)
+	g.Used = cache.New(5*time.Minute, 10*time.Minute)
+
 	return nil
 }
 
@@ -94,7 +95,8 @@ func (g *Generator) Get() (string, error) {
 		}
 
 		petname := buf.String()
-		if _, ok := g.Used.LoadOrStore(petname, true); !ok {
+		if _, ok := g.Used.Get(petname); !ok {
+			g.Used.Add(petname, true, cache.NoExpiration)
 			return petname, nil
 		}
 		retry--

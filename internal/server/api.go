@@ -6,7 +6,6 @@ import (
 	"github.com/valyala/fasthttp"
 	"log"
 	"net/http"
-	"sync"
 )
 
 // AddAPI adds an API endpoint
@@ -60,7 +59,7 @@ func (i *Instance) ReloadAPI(ctx *fasthttp.RequestCtx) {
 	ctx.SetContentType("application/json; charset=UTF-8")
 
 	if a, ok := i.API[ctx.UserValue("api").(string)]; ok {
-		a.Generator.Used = new(sync.Map)
+		a.Generator.Used.Flush()
 		return
 	}
 
