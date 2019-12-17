@@ -3,6 +3,7 @@ module github.com/ichbinfrog/petname
 go 1.13
 
 require (
+	github.com/buaazp/fasthttprouter v0.1.1
 	github.com/go-openapi/analysis v0.19.6 // indirect
 	github.com/go-openapi/errors v0.19.2
 	github.com/go-openapi/jsonreference v0.19.3 // indirect
@@ -24,7 +25,7 @@ require (
 	github.com/spf13/cobra v0.0.5
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/spf13/viper v1.5.0
-	github.com/valyala/fasthttp v1.6.0 // indirect
+	github.com/valyala/fasthttp v1.6.0
 	go.mongodb.org/mongo-driver v1.1.3 // indirect
 	golang.org/x/net v0.0.0-20191105084925-a882066a44e0
 	golang.org/x/sys v0.0.0-20191105231009-c1f44814a5cd // indirect

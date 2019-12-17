@@ -82,7 +82,13 @@ func (g *Generator) New(t string, n string) error {
 // Get generates an unique petname and returns that string
 func (g *Generator) Get() (string, error) {
 	buf := &bytes.Buffer{}
+	retry := 5
+
 	for {
+		if retry <= 0 {
+			break
+		}
+
 		if err := g.Template.Execute(buf, nil); err != nil {
 			return "", err
 		}
@@ -91,6 +97,7 @@ func (g *Generator) Get() (string, error) {
 		if _, ok := g.Used.LoadOrStore(petname, true); !ok {
 			return petname, nil
 		}
+		retry--
 	}
 
 	return "", fmt.Errorf("Generation failed")

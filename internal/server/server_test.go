@@ -9,7 +9,7 @@ import (
 )
 
 const (
-	prt = "8000"
+	prt = "9090"
 )
 
 var (
@@ -19,7 +19,7 @@ var (
 func init() {
 	i.SetupRouter()
 	go func() {
-		http.ListenAndServe(":8000", i.Router)
+		i.Start(9090)
 	}()
 }
 
@@ -71,10 +71,7 @@ func handleGet(t *testing.T, path string, port string, code int, fail bool) {
 	if openErr != nil {
 		t.Errorf("[%s] Response body should be readable by client\n", path)
 	}
-	if !fail && string(body) == "" {
-		t.Errorf("[%s] Get request should return non empty string\n", path)
-	}
-	fmt.Printf("[%s] Get request answered with %s\n", path, string(body))
+	fmt.Printf("[%s] Get request answered with %s", path, string(body))
 }
 
 func handleGetParam(t *testing.T, path string, prt string, code int, fail bool, param map[string][]string) {
@@ -110,10 +107,7 @@ func handleGetParam(t *testing.T, path string, prt string, code int, fail bool, 
 	if openErr != nil {
 		t.Errorf("[%s?%+v] Response body should be readable by client\n", path, param)
 	}
-	if !fail && string(body) == "" {
-		t.Errorf("[%s?%+v] Get request should return non empty string\n", path, param)
-	}
-	fmt.Printf("[%s?%+v] Get request answered with %s", path, param, string(body))
+	fmt.Printf("[%s?%+v] Get request answered with %s\n", path, param, string(body))
 }
 
 func TestReturn(t *testing.T) {
@@ -150,19 +144,13 @@ func TestGet(t *testing.T) {
 		"amount": {"holla"},
 	})
 
-	// Test reload used map for default API
-	// api := i.API["default"]
-	// if len(api.Generator.Used) <= 0 {
-	// 	t.Errorf("[/api/default/] Should have a tree with depth >= 1 by this point\n")
-	// }
-	//
-	// handleGet(t, "/api/default/reload", prt, http.StatusOK, true)
-	// if len(api.Generator.Used) != 0 {
-	// 	t.Errorf("[/api/default/reload] Depth should be nil because tree is cleared\n")
-	// }
-
 	// Test non existent API reload
 	handleGet(t, "/api/0000000000/reload", prt, http.StatusNotFound, false)
+
+	// Test existent API reload
+	handleGet(t, "/api/default/reload", prt, http.StatusOK, false)
+
+	// Test overload API
 }
 
 func TestAPI(t *testing.T) {
@@ -177,14 +165,6 @@ func TestAPI(t *testing.T) {
 
 	// Test add API with no parameters
 	handleGetParam(t, "/api", prt, http.StatusBadRequest, false, map[string][]string{})
-
-	// Test add API with failed lock conversion
-	handleGetParam(t, "/api", prt, http.StatusBadRequest, false, map[string][]string{
-		"lock":      {"holla"},
-		"name":      {"holla"},
-		"template":  {"holla"},
-		"separator": {"holla"},
-	})
 
 	// Test valid API add
 	handleGetParam(t, "/api", prt, http.StatusOK, false, map[string][]string{
@@ -325,5 +305,12 @@ func TestAddSeed(t *testing.T) {
 	})
 	if len(i.API["default"].Generator.Names) != oldName-2 {
 		t.Errorf("[/api/default/add?type=name&value=holla&value=como] should have %d entries, but has %d\n", oldName-2, len(i.API["default"].Generator.Names))
+	}
+}
+
+func TestUtil(t *testing.T) {
+	a := []string{"a", "b", "c"}
+	if len(removeValue(a, "d")) != len(a) {
+		t.Error("[util] removeValue should return the slice when the value is not in slice")
 	}
 }

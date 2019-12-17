@@ -2,75 +2,69 @@ package server
 
 import (
 	"fmt"
-	"github.com/gorilla/mux"
 	"github.com/ichbinfrog/petname/pkg/response"
+	"github.com/valyala/fasthttp"
+	"log"
 	"net/http"
-	"strconv"
 	"sync"
 )
 
 // AddAPI adds an API endpoint
-func (i *Instance) AddAPI(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-	param := r.URL.Query()
+func (i *Instance) AddAPI(ctx *fasthttp.RequestCtx) {
+	ctx.SetContentType("application/json; charset=UTF-8")
+	param := ctx.QueryArgs()
 	err := ""
-	if len(param) < 1 {
+	if param.Len() < 1 {
 		err = err + response.QueryEmptyParam
 	}
 
-	if param["lock"] == nil || len(param["lock"]) != 1 {
+	if !param.Has("lock") {
 		err = err + response.QueryEmptyLock
 	}
 
-	if param["name"] == nil || len(param["name"]) != 1 {
+	if !param.Has("name") {
 		err = err + response.QueryEmptyName
 	}
 
-	if param["template"] == nil || len(param["template"]) != 1 {
+	if !param.Has("template") {
 		err = err + response.QueryEmptyTemplate
 	}
 
 	if len(err) != 0 {
-		http.Error(w, err, http.StatusBadRequest)
+		ctx.Error(err, http.StatusBadRequest)
 		return
 	}
 
-	lock, errConv := strconv.ParseBool(param["lock"][0])
-	if errConv != nil {
-		http.Error(w, errConv.Error(), http.StatusBadRequest)
-		return
-	}
-
-	if i.SetupAPI(param["name"][0], lock, param["template"][0]) {
-		w.Write([]byte("Successful insert"))
+	if i.SetupAPI(string(param.Peek("name")), param.GetBool("lock"), string(param.Peek("template"))) {
+		ctx.SetStatusCode(http.StatusOK)
 	} else {
-		http.Error(w, response.APIAddDuplicateError, http.StatusBadRequest)
+		ctx.Error(response.APIAddDuplicateError, http.StatusBadRequest)
 	}
 }
 
 // GetInfoAPI returns informations about a specific API
-func (i *Instance) GetInfoAPI(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+func (i *Instance) GetInfoAPI(ctx *fasthttp.RequestCtx) {
+	ctx.SetContentType("application/json; charset=UTF-8")
 	for _, a := range i.API {
-		if a.Name == mux.Vars(r)["api"] {
-			w.Write([]byte(fmt.Sprintf("%+v\n", a)))
+		if a.Name == ctx.UserValue("api") {
+			ctx.Write([]byte(fmt.Sprintf("%+v\n", a)))
 			return
 		}
 	}
 
-	http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+	ctx.Error(http.StatusText(http.StatusNotFound), http.StatusNotFound)
 }
 
 // ReloadAPI cleans the Used binary tree for a specific API
-func (i *Instance) ReloadAPI(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+func (i *Instance) ReloadAPI(ctx *fasthttp.RequestCtx) {
+	ctx.SetContentType("application/json; charset=UTF-8")
 
-	if a, ok := i.API[mux.Vars(r)["api"]]; ok {
+	if a, ok := i.API[ctx.UserValue("api").(string)]; ok {
 		a.Generator.Used = new(sync.Map)
 		return
 	}
 
-	http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+	ctx.Error(http.StatusText(http.StatusNotFound), http.StatusNotFound)
 }
 
 const (
@@ -82,73 +76,83 @@ const (
 // AddSeed adds a seed to a specific api endpoint
 // note that duplicate seed is explicitly allowed in order to allow
 // for increasing odds as well as to allow some names to pop up twice
-func (i *Instance) AddSeed(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-	param := r.URL.Query()
-	if len(param) < 2 {
-		http.Error(w, response.SeedAddParamRequired, http.StatusBadRequest)
+func (i *Instance) AddSeed(ctx *fasthttp.RequestCtx) {
+	ctx.SetContentType("application/json; charset=UTF-8")
+	param := ctx.QueryArgs()
+	if param.Len() < 2 {
+		ctx.Error(response.SeedAddParamRequired, http.StatusBadRequest)
 		return
 	}
-	seedType := param["type"]
-	if seedType != nil {
-		value := param["value"]
-		if value == nil || len(value) < 1 {
-			http.Error(w, response.SeedAddValueRequired, http.StatusBadRequest)
+	seedType := string(param.Peek("type"))
+	if len(seedType) != 0 {
+		value := param.PeekMulti("value")
+		for _, v := range value {
+			log.Println(ctx.URI(), len(value), string(v))
+		}
+		if len(value) == 0 || (len(value) == 1 && string(value[0]) == "") {
+			ctx.Error(response.SeedAddValueRequired, http.StatusBadRequest)
 			return
 		}
 
-		if a, ok := i.API[mux.Vars(r)["api"]]; ok {
-			if seedType[0] == paramAdj {
-				a.Generator.Adjectives = append(a.Generator.Adjectives, value...)
-			} else if seedType[0] == paramAdv {
-				a.Generator.Adverbs = append(a.Generator.Adverbs, value...)
-			} else if seedType[0] == paramName {
-				a.Generator.Names = append(a.Generator.Names, value...)
+		if a, ok := i.API[ctx.UserValue("api").(string)]; ok {
+			if seedType == paramAdj {
+				a.Generator.Adjectives = appendSlice(a.Generator.Adjectives, value)
+			} else if seedType == paramAdv {
+				a.Generator.Adverbs = appendSlice(a.Generator.Adverbs, value)
+			} else if seedType == paramName {
+				a.Generator.Names = appendSlice(a.Generator.Names, value)
 			} else {
-				http.Error(w, response.SeedAddTypeRequired, http.StatusBadRequest)
+				ctx.Error(response.SeedAddTypeRequired, http.StatusBadRequest)
 			}
 		} else {
-			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+			ctx.Error(http.StatusText(http.StatusNotFound), http.StatusNotFound)
 		}
 	}
 }
 
 // RemoveSeed removes a seed to a specific api endpoint
-func (i *Instance) RemoveSeed(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-	param := r.URL.Query()
-	if len(param) < 2 {
-		http.Error(w, response.SeedRmParamRequired, http.StatusBadRequest)
+func (i *Instance) RemoveSeed(ctx *fasthttp.RequestCtx) {
+	ctx.SetContentType("application/json; charset=UTF-8")
+	param := ctx.QueryArgs()
+	if param.Len() < 2 {
+		ctx.Error(response.SeedRmParamRequired, http.StatusBadRequest)
 		return
 	}
 
-	seedType := param["type"]
-	if seedType != nil {
-		value := param["value"]
-		if value == nil || len(value) < 1 {
-			http.Error(w, response.SeedRmValueRequired, http.StatusBadRequest)
+	seedType := string(param.Peek("type"))
+	if len(seedType) != 0 {
+		value := param.PeekMulti("value")
+		if len(value) == 0 || (len(value) == 1 && string(value[0]) == "") {
+			ctx.Error(response.SeedRmValueRequired, http.StatusBadRequest)
 			return
 		}
 
-		if a, ok := i.API[mux.Vars(r)["api"]]; ok {
-			if seedType[0] == paramAdj {
+		if a, ok := i.API[ctx.UserValue("api").(string)]; ok {
+			if seedType == paramAdj {
 				a.Generator.Adjectives = removeSlice(a.Generator.Adjectives, value)
-			} else if seedType[0] == paramAdv {
+			} else if seedType == paramAdv {
 				a.Generator.Adverbs = removeSlice(a.Generator.Adverbs, value)
-			} else if seedType[0] == paramName {
+			} else if seedType == paramName {
 				a.Generator.Names = removeSlice(a.Generator.Names, value)
 			} else {
-				http.Error(w, response.SeedRmTypeRequired, http.StatusBadRequest)
+				ctx.Error(response.SeedRmTypeRequired, http.StatusBadRequest)
 			}
 		} else {
-			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+			ctx.Error(http.StatusText(http.StatusNotFound), http.StatusNotFound)
 		}
 	}
 }
 
-func removeSlice(a []string, k []string) []string {
+func appendSlice(a []string, k [][]byte) []string {
 	for _, v := range k {
-		a = removeValue(a, v)
+		a = append(a, string(v))
+	}
+	return a
+}
+
+func removeSlice(a []string, k [][]byte) []string {
+	for _, v := range k {
+		a = removeValue(a, string(v))
 	}
 	return a
 }
