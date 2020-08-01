@@ -16,7 +16,7 @@ You can use this server to:
 
 Using the docker image:
 ```sh
-docker run --rm -d -p $PORT:$PORT ichbinfrog/petname:v0.1.1 serve --port $PORT
+docker run --rm -d -p $PORT:$PORT ichbinfrog/petname:v0.2 serve --port $PORT
 ```
 
 Using the binary:
@@ -70,18 +70,18 @@ Now you can query the `/get/v2` endpoint and it would give you names such as: `g
 Using the docker image (recommended):
 ```sh
 # If you want to build your own image
-docker build . -t petname:v0.1.1
+docker build . -t petname:v0.2
 
 # If you want to pull directly from dockerhub
-docker pull ichbinfrog/petname:v0.1.1
+docker pull ichbinfrog/petname:v0.2
 ```
 
 Using the binary:
 ```sh
 # Assuming you've downloaded the latest release
 # on the github release tab
-chmod +x ./petname:v0.1.1
+chmod +x ./petname:v0.2
 
 # If you want to add it to your path
-mv ./petname:v0.1.1 /usr/local/bin/petname
+mv ./petname:v0.2 /usr/local/bin/petname
 ```
