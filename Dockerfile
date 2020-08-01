@@ -1,4 +1,3 @@
-ARG VERSION="v0.1.0"
 ARG GO_VERSION="1.14.6"
 
 # Builder image
